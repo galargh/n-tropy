@@ -1,0 +1,14 @@
+{
+  "name": "time-attack",
+  "version": "1.0.0",
+  "description": "A password stealing timing attack",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.72.0"
+  }
+}
