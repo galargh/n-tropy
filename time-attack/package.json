@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ascii-histogram": "^1.2.1",
     "request": "^2.72.0"
   }
 }
