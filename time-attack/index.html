@@ -113,6 +113,7 @@
 
       function sendPassword(password, url = 'http://localhost:8888/secret') {
         return new Promise(resolve => {
+          $('#password').text(password);
           const request = new XMLHttpRequest();
           let timer = new Date();
 
@@ -136,7 +137,7 @@
       function displayPasswordLengthResponseTimes(result) {
         return new Promise(resolve => {
           $('#passwordLength').highcharts({
-            chart: { type: 'column', width: 400 },
+            chart: { type: 'column' },
             title: { text: 'Response times for different password lengths' },
             xAxis: { title: { text: 'Password length' } },
             yAxis: { title: { text: 'Response time' } },
@@ -157,8 +158,9 @@
           $('#passwordLetters').append(chart);
 
           $(`#${result.position}`).highcharts({
-            chart: { type: 'column', width: 400 },
+            chart: { type: 'column' },
             title: { text: `Response times for letter at position ${result.position}` },
+            xAxis: { categories: ['A',	'B',	'C',	'D',	'E',	'F',	'G',	'H',	'I',	'J',	'K',	'L',	'M',	'N',	'O',	'P',	'Q',	'R',	'S',	'T',	'U',	'V',	'W',	'X',	'Y',	'Z', 'a',	'b',	'c',	'd',	'e',	'f',	'g',	'h',	'i',	'j',	'k',	'l',	'm',	'n',	'o',	'p',	'q',	'r',	's',	't',	'u',	'v',	'w',	'x',	'y', 'z'] },
             yAxis: { title: { text: 'Response time' } },
             series: [{
               name: 'Response times',
@@ -201,7 +203,6 @@
     <span id="password"></span>
 
     <div id="passwordLength"></div>
-    <div id="passwordLetters" style="display: flex; flex-wrap: wrap;">
-    </div>
+    <div id="passwordLetters"></div>
   </body>
 </html>
