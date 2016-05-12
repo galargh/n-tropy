@@ -1,0 +1,151 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>PCS</title>
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+
+    <style>
+      html, body {
+        background-color: #F15A5C;
+        font-family: "Roboto Mono", monospace;
+        color: white;
+        height: 100%;
+        width: 100%;
+      }
+      input {
+      	color: #3c3c3c;
+      	font-family: "Roboto Mono", monospace;
+        font-size: 47px;
+        padding: 10px;
+        border: none;
+      	border-radius: 0;
+        width: 800px;
+      }
+      input:focus {
+        outline: none;
+      }
+      #buttons button {
+        background-color: #7E5AF1;
+        color: white;
+      	font-family: "Roboto Mono", monospace;
+        font-size: 40px;
+        padding: 15px 10px;
+        border: none;
+      	border-radius: 0;
+        margin-top: 10px;
+        text-align: right;
+        width: 395px;
+        cursor: pointer;
+      }
+      button:active {
+        outline: none;
+      }
+      button:focus {
+        outline:none;
+      }
+      #box {
+        width: 800px;
+        height: 175px;
+        position: absolute;
+        left:0;
+        right:0;
+        top:0;
+        bottom:0;
+        margin: auto;
+      }
+      #modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4);
+      }
+      #modal button {
+        z-index: 2;
+        background-color: #7E5AF1;
+        color: white;
+        font-family: "Roboto Mono", monospace;
+        font-size: 40px;
+        padding: 15px 10px;
+        border: none;
+        border-radius: 0;
+        margin-top: 10px;
+        text-align: right;
+        width: 800px;
+        height: 175px;
+        cursor: pointer;
+        position: absolute;
+        left:0;
+        right:0;
+        top:0;
+        bottom:0;
+        margin: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="box">
+      <div id="input">
+        <input id="password" type="password" placeholder="password" />
+      </div>
+      <div id="buttons">
+        <button type="button" onclick="set()">set password</button>
+        <button type="button" onclick="get()">get secret</button>
+      </div>
+    </div>
+    <div id="modal">
+      <button id="alert" type="button" onclick="done()"></button>
+    </div>
+
+    <script>
+      function done() {
+        var input = document.getElementById('password')
+        var modal = document.getElementById('modal')
+        input.value = '';
+        input.disabled = false;
+        modal.style.display = 'none'
+      };
+      function get() {
+        var input = document.getElementById('password')
+        var modal = document.getElementById('modal')
+        var alert = document.getElementById('alert')
+        input.disabled = true;
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4) {
+            alert.innerHTML = xhttp.responseText
+            modal.style.display = 'block'
+          }
+        };
+        xhttp.open("POST", "secret", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(JSON.stringify({
+          password: input.value
+        }));
+      };
+      function set() {
+        var input = document.getElementById('password')
+        var modal = document.getElementById('modal')
+        var alert = document.getElementById('alert')
+        input.disabled = true;
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4) {
+            alert.innerHTML = xhttp.responseText
+            modal.style.display = 'block'
+          }
+        };
+        xhttp.open("POST", "password", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(JSON.stringify({
+          password: input.value
+        }));
+      };
+    </script>
+  </body>
+</html>
