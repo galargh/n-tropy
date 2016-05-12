@@ -5,6 +5,43 @@
     <title>Facebook timing attack</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+
+    <style>
+      html, body {
+        background-color: #F15A5C;
+        font-family: "Roboto Mono", monospace;
+        color: white;
+        height: 100%;
+        width: 100%;
+        margin: 0;
+      }
+      input {
+        margin: 20px;
+        background-color: #7E5AF1;
+        color: white;
+      	font-family: "Roboto Mono", monospace;
+        font-size: 20px;
+        border: none;
+      	border-radius: 0;
+        text-align: right;
+        cursor: pointer;
+      }
+      input:active {
+        outline: none;
+      }
+      input:focus {
+        outline:none;
+      }
+      #passwordLength, #passwordLetters {
+        width: 100%;
+      }
+      #passwordLetters span {
+        width: 50%;
+        float: left;
+        margin: auto;
+      }
+    </style>
 
     <script type="text/javascript">
       /**
