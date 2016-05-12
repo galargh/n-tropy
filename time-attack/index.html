@@ -85,6 +85,9 @@
         });
       }
 
+      /**
+       * Generates `position` passwords from password.
+       */
       function generatePasswords(password, position) {
         const passwords = [];
 
@@ -99,6 +102,10 @@
         return passwords;
       }
 
+      /**
+       * Takes a list of passwords and calls sendPassword for each of them,
+       * resolving with a list of return values from sendPassword.
+       */
       function sendPasswords(passwords, results = []) {
         return new Promise(resolve => {
           if (passwords.length) {
@@ -111,6 +118,11 @@
         });
       }
 
+      /**
+       * Makes a POST request to the server with the given password.
+       * Resolves with an object containing the password, elapsed time and
+       * a field indicating if the password was valid.
+       */
       function sendPassword(password, url = 'http://localhost:8888/secret') {
         return new Promise(resolve => {
           $('#password').text(password);
@@ -134,6 +146,9 @@
         });
       }
 
+      /**
+       * Creates a chart displaying the response times for a different password lengths.
+       */
       function displayPasswordLengthResponseTimes(result) {
         return new Promise(resolve => {
           $('#passwordLength').highcharts({
@@ -151,6 +166,9 @@
         });
       }
 
+      /*
+       * Creates a chart displaying the response times for a given list of passwords.
+       */
       function displayPasswordLetterResponseTimes(result) {
         return new Promise(resolve => {
           const chart = document.createElement('span');
@@ -172,6 +190,9 @@
         });
       }
 
+      /**
+       * POST request to change the password.
+       */
       function changePassword() {
         $.ajax({
           type: 'POST',
@@ -181,6 +202,9 @@
         });
       }
 
+      /**
+       * Clears the charts and starts cracking the password.
+       */
       function crack() {
         $('#passwordLetters').empty();
         $('#password').text('');
