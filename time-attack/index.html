@@ -27,7 +27,7 @@
               }
             });
 
-            password = password + 'a';
+            password = password + '`';
           }
         });
       }
@@ -61,7 +61,7 @@
           if (position === passwordLength) { return reject(); }
 
           if (password.length < passwordLength) {
-            for( let i = password.length; i < passwordLength; password += 'a', i++);
+            for( let i = password.length; i < passwordLength; password += '`', i++);
           }
 
           const passwords = generatePasswords(password, position);
@@ -191,18 +191,6 @@
       }
 
       /**
-       * POST request to change the password.
-       */
-      function changePassword() {
-        $.ajax({
-          type: 'POST',
-          url: 'http://localhost:8888/password',
-          contentType : 'application/json',
-          data: JSON.stringify({ password: $('#passwordInput').val() }),
-        });
-      }
-
-      /**
        * Clears the charts and starts cracking the password.
        */
       function crack() {
@@ -217,10 +205,6 @@
     </script>
   </head>
   <body>
-
-    <input id="passwordInput" type="text" name="password" value="pcs">
-    <input type="button" value="Set password" onclick="changePassword()">
-
     <input type="button" value="Crack password" onclick="crack()">
 
     <span>Password:</span>

@@ -1,13 +1,5 @@
 var request = require('request')
 
-function nextChar(c) {
-    if (c == 'z') {
-        return 'A'
-    }
-    return String.fromCharCode(c.charCodeAt(0) + 1);
-}
-nextChar('a');
-
 function getParams(password) {
     return {
         uri: 'http://localhost:8888/secret',
@@ -31,7 +23,7 @@ function tryLength(password, time, callback) {
         if (res.time > time) {
             return callback(password, res.time)
         }
-        tryLength(password + 'a', res.time, callback)
+        tryLength(password + '`', res.time, callback)
     })
 }
 
